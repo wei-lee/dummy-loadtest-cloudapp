@@ -2,12 +2,16 @@ var mbaasApi = require('fh-mbaas-api');
 var express = require('express');
 var mbaasExpress = mbaasApi.mbaasExpress();
 var cors = require('cors');
+var prom = require('prom-client');
 
 // list the endpoints which you want to make securable here
 var securableEndpoints;
-securableEndpoints = ['/hello'];
+securableEndpoints = ['/fhdb', '/metrics'];
 
 var app = express();
+
+// putting this first so that it's run first
+app.use(require('./lib/prom-middleware.js'));
 
 // Enable CORS for all requests
 app.use(cors());
@@ -22,9 +26,11 @@ app.use(express.static(__dirname + '/public'));
 // Note: important that this is added just before your own Routes
 app.use(mbaasExpress.fhmiddleware());
 
-app.use('/hello', require('./lib/hello.js')());
 app.use('/fhdb', require('./lib/fhdb.js')());
 
+app.use('/metrics', function(req, res) {
+  res.end(prom.register.metrics());
+});
 
 // Important that this is last!
 app.use(mbaasExpress.errorHandler());
