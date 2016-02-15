@@ -5,8 +5,12 @@ var cors = require('cors');
 var prom = require('prom-client');
 
 // list the endpoints which you want to make securable here
-var securableEndpoints;
-securableEndpoints = ['/fhcache', '/fhdb', '/metrics'];
+var securableEndpoints = [
+  '/fhcache',
+  '/fhdb',
+  'fhstats',
+  '/metrics'
+];
 
 var app = express();
 
@@ -28,6 +32,7 @@ app.use(mbaasExpress.fhmiddleware());
 
 app.use('/fhdb', require('./lib/fhdb.js')());
 app.use('/fhcache', require('./lib/fhcache.js')());
+app.use('/fhstats', require('./lib/fhstats.js')());
 
 app.use('/metrics', function(req, res) {
   res.end(prom.register.metrics());
