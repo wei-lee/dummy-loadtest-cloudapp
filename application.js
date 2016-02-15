@@ -6,7 +6,7 @@ var prom = require('prom-client');
 
 // list the endpoints which you want to make securable here
 var securableEndpoints;
-securableEndpoints = ['/fhdb', '/metrics'];
+securableEndpoints = ['/fhcache', '/fhdb', '/metrics'];
 
 var app = express();
 
@@ -27,6 +27,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(mbaasExpress.fhmiddleware());
 
 app.use('/fhdb', require('./lib/fhdb.js')());
+app.use('/fhcache', require('./lib/fhcache.js')());
 
 app.use('/metrics', function(req, res) {
   res.end(prom.register.metrics());
